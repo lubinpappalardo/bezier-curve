@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Cubic Bezier Curve</title>
+        <style>
+            body {
+                margin: 0;
+                width: 100%;
+                min-height: 100vh;
+                overflow: hidden;
+            }
+            canvas {
+                width: 100%;
+                height: 100%;
+                display: block;
+                image-rendering: pixelated;
+            }
+            input {
+                position: absolute;
+                top: 50px;
+                left: 10px;
+                z-index: 2;
+            }
+            .point {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                z-index: 1;
+                transform: translate(-50%, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <div class="point" id="p0"></div>
+        <div class="point" id="p1"></div>
+        <div class="point" id="p2"></div>
+        <div class="point" id="p3"></div>
+        <input title="t-value" type="range" min="0" max="1" step="0.01" value="0.25" />
+        <script>
+        function bezierCurve() {
+            const canvas = document.getElementById("canvas");
+            const p0 = document.getElementById("p0");
+            if (canvas.getContext) {
+                const ctx = canvas.getContext("2d");
+                let t = 0.25;
+
+                document.querySelector("input").addEventListener("input", function() {
+                    t = this.value;
+                });
+
+                const points = {
+                    "p0": {x: 100, y: 100, color: 'blue'},
+                    "p1": {x: 200, y: 300, color: 'red'},
+                    "p2": {x: 400, y: 300, color: 'red'},
+                    "p3": {x: 500, y: 200, color: 'lime'}
+                }
+
+                p0.style.left = points.p0.x + "px";
+                p0.style.top = points.p0.y + "px";
+                p1.style.left = points.p1.x + "px";
+                p1.style.top = points.p1.y + "px";
+                p2.style.left = points.p2.x + "px";
+                p2.style.top = points.p2.y + "px";
+                p3.style.left = points.p3.x + "px";
+                p3.style.top = points.p3.y + "px";
+
+                p0.addEventListener("mousedown", function(e) {
+                    let offsetX = e.clientX - points.p0.x;
+                    let offsetY = e.clientY - points.p0.y;
+                    document.addEventListener("mousemove", movePoint);
+                    document.addEventListener("mouseup", function() {
+                        document.removeEventListener("mousemove", movePoint);
+                    });
+
+                    function movePoint(e) {
+                        points.p0.x = e.clientX - offsetX;
+                        points.p0.y = e.clientY - offsetY;
+                        p0.style.left = points.p0.x + "px";
+                        p0.style.top = points.p0.y + "px";
+                    }
+                });
+
+                p1.addEventListener("mousedown", function(e) {
+                    let offsetX = e.clientX - points.p1.x;
+                    let offsetY = e.clientY - points.p1.y;
+                    document.addEventListener("mousemove", movePoint);
+                    document.addEventListener("mouseup", function() {
+                        document.removeEventListener("mousemove", movePoint);
+                    });
+
+                    function movePoint(e) {
+                        points.p1.x = e.clientX - offsetX;
+                        points.p1.y = e.clientY - offsetY;
+                        p1.style.left = points.p1.x + "px";
+                        p1.style.top = points.p1.y + "px";
+                    }
+                });
+
+                p2.addEventListener("mousedown", function(e) {
+                    let offsetX = e.clientX - points.p2.x;
+                    let offsetY = e.clientY - points.p2.y;
+                    document.addEventListener("mousemove", movePoint);
+                    document.addEventListener("mouseup", function() {
+                        document.removeEventListener("mousemove", movePoint);
+                    });
+
+                    function movePoint(e) {
+                        points.p2.x = e.clientX - offsetX;
+                        points.p2.y = e.clientY - offsetY;
+                        p2.style.left = points.p2.x + "px";
+                        p2.style.top = points.p2.y + "px";
+                    }
+                });
+
+                p3.addEventListener("mousedown", function(e) {
+                    let offsetX = e.clientX - points.p3.x;
+                    let offsetY = e.clientY - points.p3.y;
+                    document.addEventListener("mousemove", movePoint);
+                    document.addEventListener("mouseup", function() {
+                        document.removeEventListener("mousemove", movePoint);
+                    });
+
+                    function movePoint(e) {
+                        points.p3.x = e.clientX - offsetX;
+                        points.p3.y = e.clientY - offsetY;
+                        p3.style.left = points.p3.x + "px";
+                        p3.style.top = points.p3.y + "px";
+                    }
+                });
+
+                
+                function drawPoint(x, y, color) {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+
+                function drawLine(point1, point2) {
+                    ctx.strokeStyle = 'grey';
+                    ctx.beginPath();
+                    ctx.moveTo(point1.x, point1.y);
+                    ctx.lineTo(point2.x, point2.y);
+                    ctx.stroke();
+                }
+
+                function linearInterpolation(p0, p1, t) {
+                    return {
+                        x: p0.x + (p1.x - p0.x) * t,
+                        y: p0.y + (p1.y - p0.y) * t
+                    }
+                }
+
+                function draw() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = "16px Arial";
+                    ctx.fillStyle = "black";
+                    ctx.fillText("Bezier curves are cool (interactive simulation by Lubin Pappalardo)", 10, 20);
+                    ctx.fillText("Move the 4 control points and change the value of t with the slider input", 10, 40);
+
+                    // bezier curve
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(points.p0.x, points.p0.y);
+                    ctx.strokeStyle = 'red';
+                    ctx.bezierCurveTo(points.p1.x, points.p1.y, points.p2.x, points.p2.y, points.p3.x, points.p3.y);
+                    ctx.stroke();
+
+                    ctx.lineWidth = 1;
+
+                    // lines between control points
+                    drawLine(points.p0, points.p1);
+                    drawLine(points.p1, points.p2);
+                    drawLine(points.p2, points.p3);
+                    
+                    // control points
+                    for (let point in points) {
+                        drawPoint(points[point].x, points[point].y, points[point].color);
+                        ctx.fillText(point, points[point].x + 10, points[point].y - 10);
+                    }
+
+                    let x1 = linearInterpolation(points.p0, points.p1, t);
+                    let x2 = linearInterpolation(points.p1, points.p2, t);
+                    let x3 = linearInterpolation(points.p2, points.p3, t);
+
+                    drawLine(x1, x2);
+                    drawLine(x2, x3);
+
+                    drawPoint(x1.x, x1.y, 'purple');
+                    drawPoint(x2.x, x2.y, 'purple');
+                    drawPoint(x3.x, x3.y, 'purple');
+
+                    let x4 = linearInterpolation(x1, x2, t);
+                    let x5 = linearInterpolation(x2, x3, t);
+
+                    drawLine(x4, x5)
+
+                    drawPoint(x4.x, x4.y, 'pink');
+                    drawPoint(x5.x, x5.y, 'pink');
+
+                    let x6 = linearInterpolation(x4, x5, t);
+
+                    drawPoint(x6.x, x6.y, 'orange');
+                
+                    requestAnimationFrame(draw)
+                }
+
+                draw();
+
+            }
+        }
+        window.addEventListener("load", bezierCurve());
+        </script>
+    </body>
+</html>
